@@ -1,0 +1,52 @@
+import tkinter as tk
+from tkinter import PhotoImage
+from tkinter import ttk
+
+
+def selectionner_carte(carte):
+    def selection():
+        print(f"You have selected the map {carte}. The game begins !")
+
+    return selection
+
+def creer_btn(root,texte,commande):
+    style = ttk.Style()
+    style.configure('TButton', font=('Helvetica bold', 20),borderwidth=50)
+    style.map('TButton', foreground=[('active', 'light green')])
+    if texte=='Play':
+        btn = ttk.Button(root, text=texte, command=lambda: choix_carte(root, btn), style='TButton')
+    else:
+        btn= ttk.Button(root, text=texte, command= commande, style='TButton')
+
+    btn.pack(pady=10)
+
+
+def choix_carte(root,btn):
+    btn.pack_forget()
+    choose = tk.Label(root, text="Choose a map:", font=("Helvetica bold", 30),background= "light green")
+    choose.pack(pady=10)
+
+    cartes = ["Enchanted forest", "Haunted castle"]
+    for i, carte in enumerate(cartes):
+        choisir = tk.Button(root, text=carte, width=20, height=3, font=("Helvetica bold", 20), fg="black",
+                            bd=0, command=selectionner_carte(carte))
+        choisir.pack(pady=10)
+
+def main():
+    root = tk.Tk()
+    root.title("Bowmaster")
+    root.geometry("1450x887")
+
+    image1 = PhotoImage(file="menujeu1.png")
+    fond = tk.Label(root, image=image1)
+    fond.place(relheight=1, relwidth=1)
+
+    welcome = tk.Label(root, text="Welcome to Bowmaster !", font=("Helvetica bold", 40), background= "light green")
+    welcome.pack(pady=120)
+
+    creer_btn(root,'Play',root.quit())
+    creer_btn(root,'Exit',root.quit)
+
+    root.mainloop()
+
+main()
