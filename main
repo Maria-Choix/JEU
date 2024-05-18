@@ -1,0 +1,122 @@
+import tkinter as tk
+from tkinter import *
+from tkinter import PhotoImage
+from tkinter import ttk
+
+class Joueur:
+    
+    def __init__(self,nom,nbr_vict = 0):
+        print("Création de joueur",nom)
+        self.nom = nom
+        self.victoire = nbr_vict
+        
+    def __repr__(self):
+        return '%s' % (self.nom)
+
+joueurs = []
+
+def vie_ennemi():
+    """fonction permettant d'enlever la vie de l'ennemi 1 quand on appuie sur le bouton lancer"""
+    global Pv_ennemi1_line,pv_ennemi1,ennemi1
+    pv_ennemi1-=25
+    canevas.delete(Pv_ennemi1_line)
+    Pv_ennemi1_line=canevas.create_line(600,20,600+pv_ennemi1*2,20,fill="red",width=5)
+    if pv_ennemi1==0 :
+        canevas.delete(ennemi1)
+        
+def creation_fleche(x_fleche,y_fleche,canevas):
+    """fonction qui crée une fleche et la place a son point de depart sur le joueur"""
+    global fleche,pointe_fleche
+    fleche=canevas.create_line(x_fleche-60,y_fleche,x_fleche-10,y_fleche,fill="yellow",width=3)
+    pointe_fleche=canevas.create_polygon(x_fleche-10,y_fleche-10,x_fleche-10,y_fleche+10,x_fleche,y_fleche,fill="yellow",width=3)
+    return x_fleche,y_fleche
+
+def lancer(x_fleche,y_fleche,canevas,fenetre):
+    """fonction qui permet de lancer la fleche sur un axe horizontal et qui prepare une nouvelle fleche a lancer"""
+    while x_fleche<1000 :
+        x_fleche+=1
+        canevas.move(pointe_fleche, 1, 0)
+        canevas.move(fleche,1,0)
+        fenetre.update()
+        print(x_fleche,"\t",y_fleche)
+        if 700<=x_fleche<=750 and 100<=y_fleche<=200 :
+            vie_ennemi()
+            canevas.delete(fleche,pointe_fleche)
+            break
+        time.sleep(0.001)
+    x_fleche=160
+    creation_fleche(x_fleche,y_fleche)
+
+def niveau1():
+    fenetre=tk.Tk()
+    fenetre.config(width=1000, height=700)
+    canevas = Canvas(fenetre, width=1000, height=700)
+    canevas.place(x=0, y=0)
+    fond = PhotoImage(file="foret.png")
+    ennemi=PhotoImage(file="ennemi.png")
+    fond_place = canevas.create_image(500,300, image=fond)
+    personnage=PhotoImage(file="personnage.png")
+    #fleche=PhotoImage(file="fleche.png")
+
+    personnage_place=canevas.create_image(100,100,image=personnage)
+    ennemi1=canevas.create_image(700,110,image=ennemi)
+    ennemi2=canevas.create_image(600,360,image=ennemi)
+    plateforme1=canevas.create_rectangle(600,200,800,250,fill="black")
+    plateforme2=canevas.create_rectangle(500,450,700,500,fill="black")
+    #fleche_place=canevas.create_image(100,100,image=fleche)
+
+    PV = pv_ennemi1 = pv_ennemi2 = 100
+    Pv_ennemi1_line=canevas.create_line(600,20,600+PV*2,20,fill="red",width=5)
+    Pv_ennemi2_line=canevas.create_line(500,270,500+PV*2,270,fill="red",width=5)
+
+    x_fleche,y_fleche=160,100
+    creation_fleche(x_fleche,y_fleche,canevas)
+    bouton_lancer=Button(fenetre,text="Lancer",font=("calibri",27,"normal"),bg="black",fg="red",command=lancer(x_fleche,y_fleche,canevas,fenetre))
+    bouton_lancer.place(x=300,y=400)
+    fenetre.mainloop()
+
+def selectionner_carte(carte):
+    def selection():
+        print(f"You have selected the map {carte}. The game begins !")
+        niveau1()
+    return selection
+
+def creer_btn(root,texte,commande):
+    style = ttk.Style()
+    style.configure('TButton', font=('Helvetica bold', 20),borderwidth=50)
+    style.map('TButton', foreground=[('active', 'light green')])
+    if texte=='Play':
+        btn = ttk.Button(root, text=texte, command=lambda: choix_carte(root, btn), style='TButton')
+        root.quit()
+    else:
+        btn= ttk.Button(root, text=texte, command= commande, style='TButton')
+    btn.pack(pady=10)
+
+
+def choix_carte(root,btn):
+    btn.pack_forget()
+    choose = tk.Label(root, text="Choose a map:", font=("Helvetica bold", 30),background= "light green")
+    choose.pack(pady=10)
+    cartes = ["Enchanted forest", "Haunted castle"]
+    for i, carte in enumerate(cartes):
+        choisir = tk.Button(root, text=carte, width=20, height=3, font=("Helvetica bold", 20), fg="black",bd=0, command=selectionner_carte(carte))
+        choisir.pack(pady=10)
+
+def main():
+    root = tk.Tk()
+    root.title("Bowmaster")
+    root.geometry("1450x887")
+    image1 = PhotoImage(file="menujeu1.png")
+    fond = tk.Label(root, image=image1)
+    fond.place(relheight=1, relwidth=1)
+    welcome = tk.Label(root, text="Welcome to Bowmaster !", font=("Helvetica bold", 40), background= "light green")
+    welcome.pack(pady=120)
+    creer_btn(root,'Play',root.quit())
+    creer_btn(root,'Exit',root.quit)
+    root.mainloop()
+main()
+
+
+
+
+
