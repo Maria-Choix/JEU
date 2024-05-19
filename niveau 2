@@ -1,0 +1,92 @@
+import time
+from tkinter import*
+from math import*
+fenetre=Tk('fenetre')
+fenetre.config(width=1000, height=650)
+canevas = Canvas(fenetre, width=1000, height=650)
+canevas.place(x=0, y=0)
+fond = PhotoImage(file="usine.png")
+ennemi=PhotoImage(file="ennemi.png")
+fond_place = canevas.create_image(500,300, image=fond)
+personnage=PhotoImage(file="personnage.png")
+
+
+
+
+personnage_place=canevas.create_image(80,550,image=personnage)
+ennemi1=canevas.create_image(700,110,image=ennemi)
+ennemi2=canevas.create_image(600,360,image=ennemi)
+plateforme1=canevas.create_rectangle(600,200,800,250,fill="black")
+plateforme2=canevas.create_rectangle(500,450,700,500,fill="black")
+plateforme3=canevas.create_rectangle(0,600,200,650,fill="black")
+
+def creation_fleche(x_fleche,y_fleche,angle):
+    """fonction qui crée une fleche et la place a son point de depart sur le joueur"""
+    global fleche,pointe_fleche
+    fleche=canevas.create_line(x_fleche-60,
+                               y_fleche,
+                               x_fleche-60+60*cos(radians(angle)),
+                               y_fleche+60 * sin(radians(angle)),
+                               fill="yellow",width=3)
+    pointe_fleche = canevas.create_polygon(x_fleche+50*cos(radians(angle-10))-60,
+                                           y_fleche+ 50*sin(radians(angle-10)),
+                                           x_fleche+50*cos(radians(angle+10))-60,
+                                           y_fleche+50*sin(radians(angle+10)),
+                                           x_fleche + 70 * cos(radians(angle))-60,
+                                           y_fleche + 70 * sin(radians(angle)), fill="yellow", width=3)
+
+PV = pv_ennemi1 = pv_ennemi2 = 100
+Pv_ennemi1_line=canevas.create_line(600,20,600+PV*2,20,fill="red",width=5)
+Pv_ennemi2_line=canevas.create_line(500,270,500+PV*2,270,fill="red",width=5)
+
+def vie_ennemi():
+    """fonction permettant d'enlever la vie de l'ennemi 1 quand on appuie sur le bouton lancer"""
+    global Pv_ennemi1_line,pv_ennemi1,ennemi1
+    pv_ennemi1-=25
+    canevas.delete(Pv_ennemi1_line)
+    Pv_ennemi1_line=canevas.create_line(600,20,600+pv_ennemi1*2,20,fill="red",width=5)
+    if pv_ennemi1==0 :
+        canevas.delete(ennemi1)
+def rotation_fleche(x_fleche,y_fleche):
+    global angle
+    angle = 0
+    while lancer_v != 1:
+        creation_fleche(x_fleche, y_fleche, angle)
+        time.sleep(0.01)
+        fenetre.update()
+        canevas.delete(fleche,pointe_fleche)
+        angle += 1
+def lancer():
+    """fonction qui permet de lancer la fleche sur un axe horizontal et qui prepare une nouvelle fleche a lancer"""
+    global x_fleche,y_fleche,lancer_v,angle,nb_fleche
+    lancer_v=1
+    nb_fleche-=1
+    V0=1
+    t = 0
+    while x_fleche<1000 :
+        vx=V0*cos(radians(pi-angle))
+        vy=((9.81)*(t*t))/2+(V0*sin(radians(pi-angle))*t)
+        x_fleche+=vx
+        y_fleche+=vy
+        print(sin(radians(angle)),vy)
+        canevas.move(pointe_fleche, vx*t,vy)
+        time.sleep(0.1)
+        #canevas.move(fleche,1*cos(radians(angle)),-(9.81*t - 1*sin(radians(angle))))
+        fenetre.update()
+        t+=1
+        angle-=20
+        #print(x_fleche,"\t",y_fleche)
+    x_fleche,y_fleche=150,550
+    lancer_v=0
+    MonTexte.config(text="Il vous reste "+ str(nb_fleche)+" fleche(s)")
+    rotation_fleche(x_fleche,y_fleche)
+nb_fleche=15
+bouton_lancer=Button(fenetre,text="Lancer",font=("calibri",20,"normal"),bg="white",fg="red",command=lancer)
+bouton_lancer.place(x=250,y=590)
+MonTexte=Label(fenetre, text="Il vous reste "+ str(nb_fleche)+" fleche(s)",fg='white',bg="green", font=('times',20,'bold'))
+MonTexte.place(x=200,y=0)
+x_fleche,y_fleche=150,550
+lancer_v=0
+while nb_fleche>0 :
+    rotation_fleche(x_fleche,y_fleche)
+fenetre . mainloop ()
